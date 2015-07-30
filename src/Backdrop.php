@@ -1,14 +1,18 @@
 <?php
 
+require_once 'util.php';
+
 class Backdrop implements ArrayAccess, Iterator {
     private $data = array();
 
     function __construct($project_name, array $directories = array()) {
         $directories = array_reverse($directories);
 
-        // first look inside ~
-        $user_info = posix_getpwuid(posix_getuid());
-        $directories[] = $user_info['dir'];
+        // first look inside ~ if exists (no Windows support)
+        $homedir = get_user_homedir();
+        if (!empty($homedir)) {
+            $directories[] = $homedir;
+        }
 
         // then look inside cwd
         $directories[] = getcwd();
